@@ -1,0 +1,21 @@
+{
+  "name": "com.caseydecoder.onevent",
+  "version": "1.0.0",
+  "displayName": "On Event",
+  "description": "A simple component that sends UnityEvents on Unity Messages (e.g. OnEnable).",
+  "unity": "2019.3",
+  "keywords": [
+    "On",
+    "Event",
+    "CaseyDeCoder",
+    "Casey",
+    "Coder",
+    "DeCoder"
+  ],
+  "author": {
+    "name": "CaseyDeCoder",
+    "email": "hofland.casey@gmail.com",
+    "url": "https://casey-says-hello.surge.sh/"
+  },
+  "hideInEditor": false
+}

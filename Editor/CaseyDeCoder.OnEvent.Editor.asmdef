@@ -1,0 +1,17 @@
+{
+    "name": "CaseyDeCoder.OnEvent.Editor",
+    "references": [
+        "GUID:ef0984c84d8834344be771bd562602b3"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
