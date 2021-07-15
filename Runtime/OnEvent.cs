@@ -4,16 +4,91 @@ using UnityEngine.Events;
 
 public class OnEvent : MonoBehaviour
 {
-    [SerializeField] private EventTrigger eventTrigger = EventTrigger.None;
-    [SerializeField] private bool checkTag = false;
-    [SerializeField] private string collisionTag = "Untagged";
-    [SerializeField] private bool triggerOnce = false;
+    [SerializeField] private EventTrigger _eventTrigger = EventTrigger.None;
+    [SerializeField] private bool _checkTag = false;
+    [SerializeField] private string _collisionTag = "Untagged";
+    [SerializeField] [Min(0f)] private float _collisionForce = 0f;
+    [SerializeField] private bool _triggerOnce = false;
 
-    [SerializeField] private UnityEvent unityEvent = new UnityEvent();
-    [SerializeField] private ColliderEvent colliderEvent = new ColliderEvent();
-    [SerializeField] private Collider2DEvent collider2DEvent = new Collider2DEvent();
-    [SerializeField] private CollisionEvent collisionEvent = new CollisionEvent();
-    [SerializeField] private Collision2DEvent collision2DEvent = new Collision2DEvent();
+    [SerializeField] private UnityEvent _unityEvent = new UnityEvent();
+    [SerializeField] private ColliderEvent _colliderEvent = new ColliderEvent();
+    [SerializeField] private Collider2DEvent _collider2DEvent = new Collider2DEvent();
+    [SerializeField] private CollisionEvent _collisionEvent = new CollisionEvent();
+    [SerializeField] private Collision2DEvent _collision2DEvent = new Collision2DEvent();
+
+    [SerializeField] private bool _sendDebugMessage = false;
+
+    public EventTrigger eventTrigger
+    {
+        get => _eventTrigger;
+        set => _eventTrigger = value;
+    }
+
+    public bool checkTag
+    {
+        get => _checkTag;
+        set => _checkTag = value;
+    }
+
+    public string collisionTag
+    {
+        get => _collisionTag;
+        set => _collisionTag = value;
+    }
+
+    public float collisionForce
+    {
+        get => _collisionForce;
+        set => _collisionForce = Mathf.Max(0f, value);
+    }
+
+    public bool triggerOnce
+    {
+        get => _triggerOnce;
+        set => _triggerOnce = value;
+    }
+
+    public UnityEvent unityEvent => _unityEvent;
+    public ColliderEvent colliderEvent => _colliderEvent;
+    public Collider2DEvent collider2DEvent => _collider2DEvent;
+    public CollisionEvent collisionEvent => _collisionEvent;
+    public Collision2DEvent collision2DEvent => _collision2DEvent;
+
+    public UnityEventBase currentEvent
+    {
+        get
+        {
+            switch (eventTrigger)
+            {
+                case EventTrigger.OnTriggerEnter:
+                case EventTrigger.OnTriggerStay:
+                case EventTrigger.OnTriggerExit:
+                    return colliderEvent;
+                case EventTrigger.OnTriggerEnter2D:
+                case EventTrigger.OnTriggerStay2D:
+                case EventTrigger.OnTriggerExit2D:
+                    return collider2DEvent;
+                case EventTrigger.OnCollisionEnter:
+                case EventTrigger.OnCollisionStay:
+                case EventTrigger.OnCollisionExit:
+                    return collisionEvent;
+                case EventTrigger.OnCollisionEnter2D:
+                case EventTrigger.OnCollisionStay2D:
+                case EventTrigger.OnCollisionExit2D:
+                    return collision2DEvent;
+                case EventTrigger.None:
+                    return null;
+                default:
+                    return unityEvent;
+            }
+        }
+    }
+
+    public bool sendDebugMessage
+    {
+        get => _sendDebugMessage;
+        set => _sendDebugMessage = value;
+    }
 
     public enum EventTrigger
     {
@@ -126,7 +201,8 @@ public class OnEvent : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (CheckTag(collision.transform.tag))
+        if (CheckTag(collision.transform.tag)
+            && collision.relativeVelocity.sqrMagnitude >= collisionForce * collisionForce)
         {
             HandleGameEvent(EventTrigger.OnCollisionEnter, collision);
         }
@@ -134,7 +210,8 @@ public class OnEvent : MonoBehaviour
 
     private void OnCollisionStay(Collision collision)
     {
-        if(CheckTag(collision.transform.tag))
+        if(CheckTag(collision.transform.tag)
+            && collision.relativeVelocity.sqrMagnitude >= collisionForce * collisionForce)
         {
             HandleGameEvent(EventTrigger.OnCollisionStay, collision);
         }
@@ -142,7 +219,8 @@ public class OnEvent : MonoBehaviour
 
     private void OnCollisionExit(Collision collision)
     {
-        if (CheckTag(collision.transform.tag))
+        if (CheckTag(collision.transform.tag)
+            && collision.relativeVelocity.sqrMagnitude >= collisionForce * collisionForce)
         {
             HandleGameEvent(EventTrigger.OnCollisionExit, collision);
         }
@@ -150,7 +228,8 @@ public class OnEvent : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (CheckTag(collision.transform.tag))
+        if (CheckTag(collision.transform.tag)
+            && collision.relativeVelocity.sqrMagnitude >= collisionForce * collisionForce)
         {
             HandleGameEvent(EventTrigger.OnCollisionEnter2D, collision);
         }
@@ -158,7 +237,8 @@ public class OnEvent : MonoBehaviour
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if(CheckTag(collision.transform.tag))
+        if(CheckTag(collision.transform.tag)
+            && collision.relativeVelocity.sqrMagnitude >= collisionForce * collisionForce)
         {
             HandleGameEvent(EventTrigger.OnCollisionStay2D, collision);
         }
@@ -166,7 +246,8 @@ public class OnEvent : MonoBehaviour
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        if (CheckTag(collision.transform.tag))
+        if (CheckTag(collision.transform.tag)
+            && collision.relativeVelocity.sqrMagnitude >= collisionForce * collisionForce)
         {
             HandleGameEvent(EventTrigger.OnCollisionExit2D, collision);
         }
@@ -224,6 +305,11 @@ public class OnEvent : MonoBehaviour
             default:
                 unityEvent.Invoke();
                 break;
+        }
+
+        if (sendDebugMessage)
+        {
+            Debug.Log($"{gameEvent} event invoked on {this}.");
         }
 
         if (triggerOnce && gameEvent != EventTrigger.OnDestroy)

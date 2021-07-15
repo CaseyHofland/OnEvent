@@ -4,32 +4,40 @@
 [CanEditMultipleObjects]
 public class OnEventEditor : Editor
 {
-    private SerializedProperty eventTrigger;
-    private SerializedProperty checkTag;
-    private SerializedProperty collisionTag;
-    private SerializedProperty triggerOnce;
+    private SerializedProperty _eventTrigger;
+    private SerializedProperty _checkTag;
+    private SerializedProperty _collisionTag;
+    private SerializedProperty _collisionForce;
+    private SerializedProperty _triggerOnce;
 
-    private SerializedProperty unityEvent;
-    private SerializedProperty colliderEvent;
-    private SerializedProperty collider2DEvent;
-    private SerializedProperty collisionEvent;
-    private SerializedProperty collision2DEvent;
+    private SerializedProperty _unityEvent;
+    private SerializedProperty _colliderEvent;
+    private SerializedProperty _collider2DEvent;
+    private SerializedProperty _collisionEvent;
+    private SerializedProperty _collision2DEvent;
+
+    private SerializedProperty _sendDebugMessage;
 
     private SerializedProperty currentEvent;
 
     private bool showTagFields = false;
+    private bool showCollisionFields = false;
 
     private void OnEnable()
     {
-        eventTrigger = serializedObject.FindProperty("eventTrigger");
-        checkTag = serializedObject.FindProperty("checkTag");
-        collisionTag = serializedObject.FindProperty("collisionTag");
-        triggerOnce = serializedObject.FindProperty("triggerOnce");
-        unityEvent = serializedObject.FindProperty("unityEvent");
-        colliderEvent = serializedObject.FindProperty("colliderEvent");
-        collider2DEvent = serializedObject.FindProperty("collider2DEvent");
-        collisionEvent = serializedObject.FindProperty("collisionEvent");
-        collision2DEvent = serializedObject.FindProperty("collision2DEvent");
+        _eventTrigger = serializedObject.FindProperty(nameof(_eventTrigger));
+        _checkTag = serializedObject.FindProperty(nameof(_checkTag));
+        _collisionTag = serializedObject.FindProperty(nameof(_collisionTag));
+        _collisionForce = serializedObject.FindProperty(nameof(_collisionForce));
+        _triggerOnce = serializedObject.FindProperty(nameof(_triggerOnce));
+
+        _unityEvent = serializedObject.FindProperty(nameof(_unityEvent));
+        _colliderEvent = serializedObject.FindProperty(nameof(_colliderEvent));
+        _collider2DEvent = serializedObject.FindProperty(nameof(_collider2DEvent));
+        _collisionEvent = serializedObject.FindProperty(nameof(_collisionEvent));
+        _collision2DEvent = serializedObject.FindProperty(nameof(_collision2DEvent));
+
+        _sendDebugMessage = serializedObject.FindProperty(nameof(_sendDebugMessage));
 
         UpdateVisibility();
     }
@@ -39,25 +47,31 @@ public class OnEventEditor : Editor
         serializedObject.Update();
 
         EditorGUI.BeginChangeCheck();
-        EditorGUILayout.PropertyField(eventTrigger);
+        EditorGUILayout.PropertyField(_eventTrigger);
         if (EditorGUI.EndChangeCheck())
         {
             UpdateVisibility();
         }
 
-        if(currentEvent != null)
+        if (currentEvent != null)
         {
-            if(showTagFields)
+            if (showTagFields)
             {
-                EditorGUILayout.PropertyField(checkTag);
-                if(checkTag.boolValue)
+                EditorGUILayout.PropertyField(_checkTag);
+                if (_checkTag.boolValue)
                 {
-                    collisionTag.stringValue = EditorGUILayout.TagField(collisionTag.displayName, collisionTag.stringValue);
+                    _collisionTag.stringValue = EditorGUILayout.TagField(_collisionTag.displayName, _collisionTag.stringValue);
                 }
             }
 
-            EditorGUILayout.PropertyField(triggerOnce);
+            if (showCollisionFields)
+            {
+                EditorGUILayout.PropertyField(_collisionForce);
+            }
+
+            EditorGUILayout.PropertyField(_triggerOnce);
             EditorGUILayout.PropertyField(currentEvent);
+            EditorGUILayout.PropertyField(_sendDebugMessage);
         }
 
         serializedObject.ApplyModifiedProperties();
@@ -65,39 +79,45 @@ public class OnEventEditor : Editor
 
     private void UpdateVisibility()
     {
-        switch (eventTrigger.enumValueIndex)
+        switch (_eventTrigger.enumValueIndex)
         {
             case (int)OnEvent.EventTrigger.OnTriggerEnter:
             case (int)OnEvent.EventTrigger.OnTriggerStay:
             case (int)OnEvent.EventTrigger.OnTriggerExit:
                 showTagFields = true;
-                currentEvent = colliderEvent;
+                showCollisionFields = false;
+                currentEvent = _colliderEvent;
                 break;
             case (int)OnEvent.EventTrigger.OnTriggerEnter2D:
             case (int)OnEvent.EventTrigger.OnTriggerStay2D:
             case (int)OnEvent.EventTrigger.OnTriggerExit2D:
                 showTagFields = true;
-                currentEvent = collider2DEvent;
+                showCollisionFields = false;
+                currentEvent = _collider2DEvent;
                 break;
             case (int)OnEvent.EventTrigger.OnCollisionEnter:
             case (int)OnEvent.EventTrigger.OnCollisionStay:
             case (int)OnEvent.EventTrigger.OnCollisionExit:
                 showTagFields = true;
-                currentEvent = collisionEvent;
+                showCollisionFields = true;
+                currentEvent = _collisionEvent;
                 break;
             case (int)OnEvent.EventTrigger.OnCollisionEnter2D:
             case (int)OnEvent.EventTrigger.OnCollisionStay2D:
             case (int)OnEvent.EventTrigger.OnCollisionExit2D:
                 showTagFields = true;
-                currentEvent = collision2DEvent;
+                showCollisionFields = true;
+                currentEvent = _collision2DEvent;
                 break;
             case (int)OnEvent.EventTrigger.None:
                 showTagFields = false;
+                showCollisionFields = false;
                 currentEvent = null;
                 break;
             default:
                 showTagFields = false;
-                currentEvent = unityEvent;
+                showCollisionFields = false;
+                currentEvent = _unityEvent;
                 break;
         }
     }
