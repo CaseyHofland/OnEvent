@@ -2,6 +2,8 @@
 using UnityEngine;
 using UnityEngine.Events;
 
+using Object = UnityEngine.Object;
+
 public class OnEvent : MonoBehaviour
 {
     [SerializeField] private EventTrigger _eventTrigger = EventTrigger.None;
@@ -316,5 +318,20 @@ public class OnEvent : MonoBehaviour
         {
             Destroy(this);
         }
+    }
+    
+    public new void Destroy(Object obj)
+    {
+        Object.Destroy(obj);
+    }
+
+    public new void DestroyImmediate(Object obj)
+    {
+        Object.DestroyImmediate(obj);
+    }
+
+    public new void DontDestroyOnLoad(Object target)
+    {
+        Object.DontDestroyOnLoad(target);
     }
 }
